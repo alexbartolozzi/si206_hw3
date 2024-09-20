@@ -5,6 +5,13 @@
 # If you worked with generative AI also add a statement for how you used it.  
 # e.g.: 
 # Asked Chatgpt hints for debugging and suggesting the general sturcture of the code
+# asked chatgpt how to capture output and enter input in a test
+
+import random
+import operator
+from unittest.mock import patch
+import unittest
+
 
 # create a Digital Book of Answers
 class DigitalBookofAnswers():
@@ -15,17 +22,23 @@ class DigitalBookofAnswers():
     #       answers: a list of potential answers
     # RETURNS: None
     def __init__(self, answers):
-
-        pass
-
+        self.book_answer_list = answers
+        self.questions_asked_list = []
+        self.answered_list = []
 
     # Create the __str__ method
     # ARGUMENTS: 
     #       self: the curent object
     # RETURNS: a string
     def __str__(self):
-
-        pass
+        res = ''
+        for index, val in enumerate(self.book_answer_list):
+            if index == len(self.book_answer_list) - 1:
+                res += val
+                break
+            res += val
+            res += " - "
+        return res
 
     # Creates the check_get_answer method
     # ARGUMENTS:
@@ -33,15 +46,32 @@ class DigitalBookofAnswers():
     #       question: the question the user wants to ask the digital book of answers
     # RETURNS: a string
     def check_get_answer(self, question):
-
-        pass
+        if question in self.questions_asked_list:
+            index = self.questions_asked_list.index(question)
+            index_of_question = self.answered_list[index]
+            return f"I've already answered this question. The answer is: {self.book_answer_list[index_of_question]}"
+        else:
+            rand_index = random.randint(0, len(self.book_answer_list) - 1)
+            self.answered_list.append(rand_index)
+            self.questions_asked_list.append(question)
+            return f"{self.book_answer_list[rand_index]}"
 
     # Creates open_book method
     # ARGUMENTS:
     #   self: the current object
     # RETURNS: None
     def open_book(self):
-
+        while True:
+            if len(self.questions_asked_list) == 0:
+                question = input("Turn 1 - Please enter your question: ")
+            else:
+                question = input(f"Turn {len(self.questions_asked_list) + 1} - Please enter your question: ")
+            if question == "Done":
+                print("Goodbye! See you soon.")
+                break
+            else:
+                answer = self.check_get_answer(question)
+                print(answer)
         pass
 
 
@@ -50,8 +80,25 @@ class DigitalBookofAnswers():
     #       self: the curent object
     # RETURNS: a list
     def answer_log(self):
+        if len(self.answered_list) == 0:
+            print("Empty")
+            return []
+        # res is a list of tuples where the first val is the freq of the answer and the second is the string
+        tuple_list = []
+        # in answer count the index is index of the answer in answer list and the value is its frequency
+        answer_count = [0] * len(self.book_answer_list)
+        for answer_index in self.answered_list:
+            answer_count[answer_index] += 1
 
-        pass
+        for i in range(0, len(answer_count)):
+            tuple_list.append((answer_count[i], (f"{answer_count[i]} - {(self.book_answer_list[i]).lower()}")))
+        sorted_res = sorted(tuple_list, key=operator.itemgetter(0), reverse=True)
+
+        res = []
+        for item in sorted_res:
+            res.append(item[1])
+
+        return res
 
 
 def test():
@@ -139,22 +186,28 @@ def test():
 
 
 
+class TestPrintOutput(unittest.TestCase):
+    # Extra Credit
+    def my_test():
+        # Put your test code here
+        with patch('builtins.input', return_value='Done'):
+            book_answer_list = ["Try again.", "Self-Reflect"]
+            test = DigitalBookofAnswers(book_answer_list)
 
-# Extra Credit
-def my_test():
-    # Put your test code here
-
-    pass
 
 
 def main():
-    pass
+    book_answer_list = ["Try again.", "Self-Reflect"]
+    sample = DigitalBookofAnswers(book_answer_list)
+    sample.open_book()
+    sample.answer_log()
 
 
 
 # Only run the main function if this file is being run (not imported)
 if __name__ == "__main__":
-    #main()
+    main()
     test() 
     # my_test() #TODO: Uncomment if you do the extra credit
     
+
