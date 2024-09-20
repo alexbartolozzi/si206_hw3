@@ -10,7 +10,8 @@
 import random
 import operator
 from unittest.mock import patch
-import unittest
+import io
+import sys
 
 
 # create a Digital Book of Answers
@@ -186,13 +187,33 @@ def test():
 
 
 
-class TestPrintOutput(unittest.TestCase):
-    # Extra Credit
-    def my_test():
-        # Put your test code here
-        with patch('builtins.input', return_value='Done'):
-            book_answer_list = ["Try again.", "Self-Reflect"]
-            test = DigitalBookofAnswers(book_answer_list)
+# Extra Credit
+def my_test():
+    answers_list = ["Stay Positive", "Go For It", "Enjoy It"]
+    test = DigitalBookofAnswers(answers_list)
+    # 1st extra cred
+    assert test.answer_log() == []
+
+    # 2nd extra cred
+    test.answered_list = [2, 1, 2]
+    assert test.answer_log() == ['2 - enjoy it', '1 - go for it', '0 - stay positive']
+
+    # 3rd extra cred
+    captureOut = io.StringIO()
+    sys.stout = captureOut
+    test.open_book()
+    output = captureOut.getvalue()
+    assert "Turn 1 - Please enter your question: " in output
+            
+    # 4th extra cred
+    captureOut = io.StringIO()
+    sys.stout = captureOut
+    test.answered_list = [0, 0, 0]
+    test.answers_list = ["Stay Positive"]
+    test.open_book()
+    output = captureOut.getvalue()
+
+    assert "I've already answered this question. The answer is: Stay Positive" in output
 
 
 
@@ -206,8 +227,8 @@ def main():
 
 # Only run the main function if this file is being run (not imported)
 if __name__ == "__main__":
-    main()
-    test() 
-    # my_test() #TODO: Uncomment if you do the extra credit
+    # main()
+    # test() 
+    my_test()
     
 
